@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+  <name>Mapa de vendas no Brasil</name>
+  <code>mapa-vendas-brasil</code>
+  <version>1.0.0.1</version>
+  <author>BF2 Team</author>
+  <link>http://www.bf2tecnologia.com.br</link>
+  <file path="admin/view/template/extension/dashboard/map_info.tpl">
+  	<operation>
+  	  <search><![CDATA[<script type="text/javascript" src="view/javascript/jquery/jqvmap/maps/jquery.vmap.world.js"></script>]]></search>
+  	  <add position="replace">
+  			<![CDATA[<script type="text/javascript" src="view/javascript/jquery/jqvmap/maps/jquery.vmap.brazil.min.js" charset="utf-8"></script>]]>
+  	  </add>
+  	</operation>
+   <operation>
+      <search><![CDATA[map: 'world_en',]]></search>
+      <add position="replace">
+        <![CDATA[map: 'brazil_br',]]>
+      </add>
+    </operation>
+  </file>
+  <file path="admin/controller/extension/dashboard/map.php">
+    <operation>
+      <search><![CDATA[$results = $this->model_report_sale->getTotalOrdersByCountry();]]></search>
+      <add position="replace"><![CDATA[$results = $this->model_report_sale->getTotalOrdersByBrazil();]]></add>
+    </operation>
+  </file>
+  <file path="admin/model/report/sale.php">
+      <operation>
+        <search><![CDATA[public function getTotalOrdersByDay() {]]></search>
+        <add position="before">
+          <![CDATA[public function getTotalOrdersByBrazil() {
+            $query = $this->db->query("SELECT COUNT(*) AS total, SUM(o.total) AS amount, z.code FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "zone` z ON (o.payment_zone_id = z.zone_id) WHERE o.order_status_id > '0' AND o.payment_country_id = '30' GROUP BY o.payment_zone_id");
+            return $query->rows;
+          }]]>
+        </add>
+      </operation>
+  </file>
+
+</modification>
